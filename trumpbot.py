@@ -27,7 +27,12 @@ info = api.user_timeline('realdonaldtrump', since_id=last_tweet)
 # Cycle through each tweet retrieved and look for the source to be Android
 for item in info:
     if re.search('android', item.source, re.I):
-        api.retweet(item.id)
+        tweet_text = 'Trump/%s RT:  https://twitter.com/realdonaldtrump/status/%d' % (item.source, item.id)
+    else:
+        tweet_text = 'NOT Trump/%s RT:  https://twitter.com/realdonaldtrump/status/%d' % (item.source, item.id)
+    
+    # Send the tweet
+    api.update_status(status=tweet_text)
 
     # Reset the last_tweet to be the more recent one
     if int(last_tweet) < int(item.id):
