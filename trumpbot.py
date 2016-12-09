@@ -34,9 +34,15 @@ for item in info:
     if re.search('android', source, re.I):
         # If the tweet was sent via Android, most likely is Trump
         tweet_text = 'Trump via %s: "%s%s" https://twitter.com/realdonaldtrump/status/%d' % (source, first_words, last_words, item.id)
+        # Check for > 140 chars
+        if len(tweet_text) > 139:
+            tweet_text = 'Trump via %s: "%s %s...%s %s" https://twitter.com/realdonaldtrump/status/%d' % (source, tweet_split[0], tweet_split[1], tweet_split[-2], tweet_split[-1], item.id)
     else:
         # If the tweet was sent with a different client, it is most likely his staff
         tweet_text = 'NOT Trump via %s: "%s%s" https://twitter.com/realdonaldtrump/status/%d' % (source, first_words, last_words, item.id)
+        # Check for > 140 chars
+        if len(tweet_text) > 139:
+            tweet_text = 'NOT Trump via %s: "%s %s...%s %s" https://twitter.com/realdonaldtrump/status/%d' % (source, tweet_split[0], tweet_split[1], tweet_split[-2], tweet_split[-1], item.id)
     
     # Send the tweet
     api.update_status(status=tweet_text)
