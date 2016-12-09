@@ -26,10 +26,17 @@ info = api.user_timeline('realdonaldtrump', since_id=last_tweet)
 
 # Cycle through each tweet retrieved and look for the source to be Android
 for item in info:
-    if re.search('android', item.source, re.I):
-        tweet_text = 'Trump/%s RT:  https://twitter.com/realdonaldtrump/status/%d' % (item.source, item.id)
+    source = item.source.replace('Twitter for ', '')
+    source = source.replace('Twitter ', '')
+    tweet_split = item.text.split()
+    first_words = '%s %s %s %s...' % (tweet_split[0], tweet_split[1], tweet_split[2], tweet_split[3])
+    last_words = '%s %s %s %s' % (tweet_split[-4], tweet_split[-3], tweet_split[-2], tweet_split[-1])
+    if re.search('android', source, re.I):
+        # If the tweet was sent via Android, most likely is Trump
+        tweet_text = 'Trump via %s: "%s%s" https://twitter.com/realdonaldtrump/status/%d' % (source, first_words, last_words, item.id)
     else:
-        tweet_text = 'NOT Trump/%s RT:  https://twitter.com/realdonaldtrump/status/%d' % (item.source, item.id)
+        # If the tweet was sent with a different client, it is most likely his staff
+        tweet_text = 'NOT Trump via %s: "%s%s" https://twitter.com/realdonaldtrump/status/%d' % (source, first_words, last_words, item.id)
     
     # Send the tweet
     api.update_status(status=tweet_text)
