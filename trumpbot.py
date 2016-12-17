@@ -1,12 +1,14 @@
 #!/usr/bin/python
 '''
     Author : Micah Hoffman (@WebBreacher)
-    Description : Trump Retweeting Bot that retweets Android-sourced tweets.
+    Description : Bot that retweets realDonaldTrump if tweet sent from Android (his phone) and not his staff. 
+                  I hope the bot helps people see the real Donald not his staffers.
+    Tied to the https://twitter.com/IsItTrump Twitter account
 
     todo -
         1 - check for errors on tweepy tweeting
         2 - output errors to file for review
-        3 - figure out method to ensure that the /tmp/file doesn't get destroyed.
+        3 - figure out method to ensure that the lasttweet file doesn't get destroyed.
 '''
 
 # Import Libraries
@@ -18,6 +20,7 @@ from creds import *
 
 # Functions
 # Pulled from Peepingtom (https://bitbucket.org/LaNMaSteR53/peepingtom/src/)
+# Tim Tomes in no way supports or has anything to do with this project
 def runCommand(cmd):
     proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
     stdout, stderr = proc.communicate()
@@ -28,11 +31,10 @@ def runCommand(cmd):
 
 # Pulled from Peepingtom (https://bitbucket.org/LaNMaSteR53/peepingtom/src/)
 def getPic(url):
-    cmd = './phantomjs --ssl-protocol=any --ignore-ssl-errors=yes ./capture.js "%s" /tmp/trump_temp.png 1000' % url
+    cmd = '/home/ubuntu/tools/trumpdroidretweeter/phantomjs --ssl-protocol=any --ignore-ssl-errors=yes /home/ubuntu/tools/trumpdroidretweeter/capture.js "%s" /tmp/trump_temp.png 1000' % url
     returncode, response = runCommand(cmd)
     print returncode, response
     return returncode
-
 
 # Set up temp file for most recent tweet id
 tweetHistoryFile = open('/home/ubuntu/tools/trumpdroidretweeter/trumpbot_lasttweet', 'r+')
@@ -54,10 +56,11 @@ info = api.user_timeline('realdonaldtrump', since_id=last_tweet)
 
 # Cycle through each tweet retrieved and look for the source to be Android
 for item in info:
+    # Strip off the beginning from the 'source'
     source = item.source.replace('Twitter for ', '')
     source = source.replace('Twitter ', '')
     if re.search('android', source, re.I):
-        # If the tweet was sent via Android, most likely is Trump
+        # If the tweet was sent via Android, it most likely is Trump
         tweet_text = 'Trump via %s: https://twitter.com/realdonaldtrump/status/%d' % (source, item.id)
     else:
         # If the tweet was sent with a different client, it is most likely his staff
@@ -69,7 +72,10 @@ for item in info:
 
     # Send the tweet
     api.update_with_media('/tmp/trump_temp.png', tweet_text)
-
+    
+    # Remove the old pic of the tweet
+    runCommand('rm /tmp/trump_temp.png')
+    
     # Reset the last_tweet to be the more recent one
     if int(last_tweet) < int(item.id):
         last_tweet = item.id
