@@ -1,7 +1,7 @@
 #!/usr/bin/python
 '''
     Author : Micah Hoffman (@WebBreacher)
-    Description : Trump Retweeting Bot that retweets Android-sourced tweets.
+    Description : A script that will retrieve and retweet pictures of a target's recent tweets
 
     todo -
         1 - check for errors on tweepy tweeting
@@ -15,6 +15,7 @@ import subprocess
 import re
 import tweepy
 from creds import *
+
 
 # Variables
 long_name = 'Donald Trump'
@@ -33,12 +34,12 @@ def runCommand(cmd):
     if stderr: response += str(stderr)
     return proc.returncode, response.strip()
 
+# Function to retrieve a screenshot of the tweeted web page
 def getPic(url):
     cmd = './phantomjs --ssl-protocol=any --ignore-ssl-errors=yes ./capture.js "%s" %s 1000' % (url, temp_file)
     returncode, response = runCommand(cmd)
     print returncode, response
     return returncode
-
 
 # Set up temp file for most recent tweet id
 tweetHistoryFile = open(tweet_hist_file, 'r+')
@@ -46,11 +47,11 @@ try:
     last_tweet = tweetHistoryFile.read()
     if last_tweet is None:
         # The tweet history file was empty or invalid
-        last_tweet = 5555555555
+        last_tweet = 883064346519187456
 except:
     print 'Error with last_tweet file'
 
-# Access and authorize our Twitter credentials from credentials.py
+# Access and authorize our Twitter credentials from creds.py
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
@@ -58,18 +59,18 @@ api = tweepy.API(auth)
 # Grab the tweets that are more recent than the last one in the last_tweet file
 info = api.user_timeline(twitter_account, since_id=last_tweet)
 
-# Cycle through each tweet retrieved and look for the source to be Android
+# Cycle through each tweet retrieved
 for item in info:
-    source = item.source.replace('Twitter for ', '')
-    source = source.replace('Twitter ', '')
     tweet_text = "A pic of %s's tweet or retweet: https://twitter.com/%s/status/%d" % (long_name, twitter_account, item.id)
 
     # Create a pic of the Twitter page
     url = 'https://twitter.com/' + twitter_account + '/status/' + str(item.id)
     pic = getPic(url)
 
-    # Send the tweet
+    # Send the tweet to Twitter from our own bot account
     api.update_with_media(temp_file, tweet_text)
+    
+    # Remove the temp_file with the pic of the current tweet
     runCommand('rm %s' % temp_file)
 
     # Reset the last_tweet to be the more recent one
@@ -77,6 +78,6 @@ for item in info:
         last_tweet = item.id
 
 # Reset the position in the last_tweet file to be at the beginning
-position = tweetHistoryFile.seek(0, 0);
+position = tweetHistoryFile.seek(0, 0)
 tweetHistoryFile.write(str(last_tweet))
 tweetHistoryFile.close()
