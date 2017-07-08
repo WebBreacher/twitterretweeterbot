@@ -9,8 +9,8 @@ Visit my blog at https://webbreacher.com/2016/12/07/trump-twitter-bot/ for more 
 - Can be used on public Twitter user by changing the Variables at the top of the Python file
 
 # Requirements
-1 - Requires phantomjs binary in the same dir as the script (unless you alter the script)
-2 - Requires capture.js in the same dir as the script (unless you alter the script)
+- Requires phantomjs binary in the same dir as the script (unless you alter the script)
+- Requires capture.js in the same dir as the script (unless you alter the script)
 
 # Thanks
 Big thanks to lanmaster53 (Tim Tomes) for use of Peepingtom code
