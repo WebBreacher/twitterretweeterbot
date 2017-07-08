@@ -11,6 +11,11 @@ Visit my blog at https://webbreacher.com/2016/12/07/trump-twitter-bot/ for more 
 # Requirements
 - Requires phantomjs binary in the same dir as the script (unless you alter the script)
 - Requires capture.js in the same dir as the script (unless you alter the script)
+- Create the temp file (by default /tmp/trump_lasttweet) and put in there a number for the tweet you want to start at.
+    - To get this number, visit the Twitter profile of your target (such as https://twitter.com/realDonaldTrump/)
+    - Find a tweet you'd like to start at and press the date link for when it was tweeted
+    - That should bring up a URL that looks like https://twitter.com/realDonaldTrump/status/883064346519187456
+    - The number at the end of the URL (the whole number) needs to go into the temp file
 
 # Thanks
 Big thanks to lanmaster53 (Tim Tomes) for use of Peepingtom code
